@@ -22,8 +22,8 @@ func healthHandler(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(http.StatusInternalServerError)
 }
 
-func Execute(port string) {
-	portPrepended := ":" + port
+func main() {
+	port := "4321"
 	http.HandleFunc("/health", jsonMiddleware(healthHandler))
-	fmt.Println(http.ListenAndServe(portPrepended, nil))
+	fmt.Println(http.ListenAndServe(port, nil))
 }

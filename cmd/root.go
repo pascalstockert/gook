@@ -3,40 +3,65 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"go-webhook/http"
 	"os"
+	"os/exec"
+	"syscall"
 )
 
 var rootCmd = &cobra.Command{
 	Use: "gook",
 }
 
-var cmdServe = &cobra.Command{
-	Use:   "serve [port]",
-	Short: "Serve API for querying statuses",
-	Long: `serve is for exposing gathered health-data via a HTTP-API.
-Optionally a port can be passed which defaults to 4321.`,
-	Args: cobra.MaximumNArgs(1),
+/*
+TODO execute http server in own process
+1. execute in separate process, save process-ID in .pid-file
+2. implement command to stop process by reading process-ID in .pid-file
+3. move cron-logic into own process
+*/
+var cmdServer = &cobra.Command{
+	Use:   "server",
+	Short: "Launch or stop a HTTP server",
+	Long:  `server is for exposing gathered health-data via a HTTP-API.`,
+}
+
+var cmdServerStart = &cobra.Command{
+	Use:   "start",
+	Short: "Launch a HTTP server",
+	Long:  `Launch a HTTP server that exposes gathered health-data via a HTTP-API.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		var port string
-		if len(args) == 0 {
-			port = "4321"
-		} else {
-			port = args[0]
+		serverPath := "./http/server.go"
+		process := exec.Command("go", "run", serverPath)
+		process.SysProcAttr = &syscall.SysProcAttr{
+			// On Unix, set to make the child process independent
+			Setpgid: true,
 		}
 
-		fmt.Printf("Serving API on port %s\n", port)
-		/*
-			TODO execute http server in own process, not goroutine
-			1. execute in separate process, save process-ID in .pid-file
-			2. implement command to stop process by reading process-ID in .pid-file
-		*/
-		go http.Execute(port)
+		if err := process.Start(); err != nil {
+			fmt.Println("Error starting server process:", err)
+			return
+		}
+
+		file, fileCreationError := os.Create("http_server.pid")
+		if fileCreationError != nil {
+			fmt.Println("Error creating PID file:", fileCreationError)
+			return
+		}
+
+		_, fileWriteError := fmt.Fprintf(file, "%d", process.Process.Pid)
+		if fileWriteError != nil {
+			fmt.Println("Error writing PID file:", fileWriteError)
+			return
+		}
+
+		_ = file.Close()
+
+		fmt.Println("Server started with PID:", process.Process.Pid)
 	},
 }
 
 func Execute() {
-	rootCmd.AddCommand(cmdServe)
+	rootCmd.AddCommand(cmdServer)
+	cmdServer.AddCommand(cmdServerStart)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
