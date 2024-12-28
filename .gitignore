@@ -1,4 +1,5 @@
 .idea
+bin
 http/http-server.log
 http/http-server.pid
 go-webhook.iml
