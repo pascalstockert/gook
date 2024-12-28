@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/cobra"
 	"os"
 	"os/exec"
+	"strconv"
 	"syscall"
 )
 
@@ -29,39 +30,58 @@ var cmdServerStart = &cobra.Command{
 	Short: "Launch a HTTP server",
 	Long:  `Launch a HTTP server that exposes gathered health-data via a HTTP-API.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		serverPath := "./http/server.go"
+		serverPath := "./http"
 		process := exec.Command("go", "run", serverPath)
-		process.SysProcAttr = &syscall.SysProcAttr{
-			// On Unix, set to make the child process independent
-			Setpgid: true,
-		}
+		process.Env = os.Environ()
 
 		if err := process.Start(); err != nil {
 			fmt.Println("Error starting server process:", err)
 			return
 		}
 
-		file, fileCreationError := os.Create("http_server.pid")
-		if fileCreationError != nil {
-			fmt.Println("Error creating PID file:", fileCreationError)
+		fmt.Println("Server started")
+	},
+}
+
+var cmdServerStop = &cobra.Command{
+	Use:   "stop",
+	Short: "Stop the HTTP server",
+	Long:  `Stops the HTTP server gracefully.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		data, err := os.ReadFile(os.Getenv("HTTP_SERVER_PID_FILE"))
+		if err != nil {
+			fmt.Println("Could not find a running HTTP server. Are you sure you started one?")
+			fmt.Println(err)
 			return
 		}
 
-		_, fileWriteError := fmt.Fprintf(file, "%d", process.Process.Pid)
-		if fileWriteError != nil {
-			fmt.Println("Error writing PID file:", fileWriteError)
+		pid, err := strconv.Atoi(string(data))
+		if err != nil {
+			fmt.Println("Error converting PID file:", err)
 			return
 		}
 
-		_ = file.Close()
+		process, err := os.FindProcess(pid)
+		if err != nil {
+			fmt.Println("Error finding process:", err)
+			return
+		}
 
-		fmt.Println("Server started with PID:", process.Process.Pid)
+		if err := process.Signal(syscall.SIGTERM); err != nil {
+			fmt.Println("Error sending SIGTERM:", err)
+			return
+		}
+
+		_ = os.Remove(os.Getenv("HTTP_SERVER_PID_FILE"))
+
+		fmt.Println("Server stopped")
 	},
 }
 
 func Execute() {
 	rootCmd.AddCommand(cmdServer)
 	cmdServer.AddCommand(cmdServerStart)
+	cmdServer.AddCommand(cmdServerStop)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
