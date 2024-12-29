@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-var environment = []struct {
+var environmentDefaults = []struct {
 	key   string
 	value string
 }{
@@ -24,8 +24,10 @@ var environment = []struct {
 }
 
 func main() {
-	for _, env := range environment {
-		_ = os.Setenv(env.key, env.value)
+	for _, env := range environmentDefaults {
+		if envAlreadySet := os.Getenv(env.key); envAlreadySet == "" {
+			_ = os.Setenv(env.key, env.value)
+		}
 	}
 
 	cmd.Execute()
