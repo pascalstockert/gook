@@ -24,6 +24,7 @@ func main() {
 	}
 
 	for _, entry := range cronEntries {
+		// TODO determine function to execute from CronEntry.Action
 		e := c.AddFunc(entry.Spec, func() {})
 		if e != nil {
 			log.Fatalf("error adding cron entry: %v", e)
