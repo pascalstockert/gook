@@ -13,12 +13,19 @@ var rootCmd = &cobra.Command{
 	Use: "gook",
 }
 
-/*
-TODO execute http server in own process
-1. execute in separate process, save process-ID in .pid-file
-2. implement command to stop process by reading process-ID in .pid-file
-3. move cron-logic into own process
-*/
+var cmdCron = &cobra.Command{
+	Use:   "cron",
+	Short: "Manage cron jobs",
+	Long:  `cron lets you add and remove jobs.`,
+}
+
+var cmdCronAdd = &cobra.Command{
+	Use:   "add",
+	Short: "Add cron job",
+	Long:  `Add a cron job.`,
+	Run:   func(cmd *cobra.Command, args []string) {},
+}
+
 var cmdServer = &cobra.Command{
 	Use:   "server",
 	Short: "Launch or stop a HTTP server",
@@ -79,6 +86,8 @@ var cmdServerStop = &cobra.Command{
 }
 
 func Execute() {
+	rootCmd.AddCommand(cmdCron)
+	cmdCron.AddCommand(cmdCronAdd)
 	rootCmd.AddCommand(cmdServer)
 	cmdServer.AddCommand(cmdServerStart)
 	cmdServer.AddCommand(cmdServerStop)

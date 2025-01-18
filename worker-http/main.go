@@ -60,5 +60,5 @@ func main() {
 	appendLog(file, "Server up at port "+ServerPort)
 	appendLog(file, "Using PID "+strconv.Itoa(os.Getpid()))
 	http.HandleFunc("/health", jsonMiddleware(healthHandler))
-	http.ListenAndServe(":"+ServerPort, nil)
+	_ = http.ListenAndServe(":"+ServerPort, nil)
 }

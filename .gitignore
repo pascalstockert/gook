@@ -1,5 +1,5 @@
 .idea
 bin
-http/http-server.log
-http/http-server.pid
+worker-http/http-server.log
+worker-http/http-server.pid
 go-webhook.iml

@@ -2,29 +2,26 @@ package main
 
 import (
 	"github.com/robfig/cron"
+	"go-webhook/shared/types"
 	"log"
 )
-
-type CronEntry struct {
-	name    string
-	spec    string
-	closure func()
-}
 
 func main() {
 	c := cron.New()
 	c.Start()
 
-	cronEntries := []CronEntry{
+	// TODO read cronEntries from file
+	cronEntries := []types.CronEntry{
 		{
-			name:    "test",
-			spec:    "@every 5s",
-			closure: func() { log.Println("test cron") },
+			Id:      "123",
+			Name:    "test",
+			Spec:    "@every 5s",
+			Closure: func() { log.Println("test cron") },
 		},
 	}
 
 	for _, entry := range cronEntries {
-		e := c.AddFunc(entry.spec, entry.closure)
+		e := c.AddFunc(entry.Spec, entry.Closure)
 		if e != nil {
 			log.Fatalf("error adding cron entry: %v", e)
 		}

@@ -1,4 +1,4 @@
-package shared
+package types
 
 type CronEntry struct {
 	Id      string
