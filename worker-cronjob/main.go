@@ -29,4 +29,6 @@ func main() {
 			log.Fatalf("error adding cron entry: %v", e)
 		}
 	}
+
+	<-make(chan struct{})
 }
