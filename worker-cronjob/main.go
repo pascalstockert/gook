@@ -13,15 +13,18 @@ func main() {
 	// TODO read cronEntries from file
 	cronEntries := []types.CronEntry{
 		{
-			Id:      "123",
-			Name:    "test",
-			Spec:    "@every 5s",
-			Closure: func() { log.Println("test cron") },
+			Id:   "1",
+			Name: "pasu-home",
+			Spec: "@every 5s",
+			Action: types.CronAction{
+				Type:     "http",
+				Resource: "https://pasu.me",
+			},
 		},
 	}
 
 	for _, entry := range cronEntries {
-		e := c.AddFunc(entry.Spec, entry.Closure)
+		e := c.AddFunc(entry.Spec, func() {})
 		if e != nil {
 			log.Fatalf("error adding cron entry: %v", e)
 		}
