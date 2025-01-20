@@ -18,6 +18,10 @@ var environmentDefaults = []struct {
 		key:   "HTTP_SERVER_PORT",
 		value: "4321",
 	},
+	{
+		key:   "CRON_FILE_FORMAT",
+		value: "json",
+	},
 }
 
 func Init() {
