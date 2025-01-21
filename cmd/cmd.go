@@ -23,7 +23,7 @@ var cmdCronAdd = &cobra.Command{
 	Use:   "add",
 	Short: "Add cron job",
 	Long:  `Add a cron job.`,
-	Run:   func(cmd *cobra.Command, args []string) {},
+	Run:   CronAdd,
 }
 
 var cmdServer = &cobra.Command{

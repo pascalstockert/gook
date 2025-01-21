@@ -1,6 +1,9 @@
 package env
 
-import "os"
+import (
+	"errors"
+	"os"
+)
 
 var environmentDefaults = []struct {
 	key   string
@@ -30,4 +33,12 @@ func Init() {
 			_ = os.Setenv(env.key, env.value)
 		}
 	}
+}
+
+func Get(key string) (string, error) {
+	if envAlreadySet := os.Getenv(key); envAlreadySet != "" {
+		return envAlreadySet, nil
+	}
+
+	return "", errors.New("environment variable " + key + " not set")
 }
