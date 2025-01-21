@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"go-webhook/shared/env"
-	files "go-webhook/shared/files/parsers"
+	"go-webhook/shared/files"
 )
 
 type cobraCommandFunc func(cmd *cobra.Command, args []string)
