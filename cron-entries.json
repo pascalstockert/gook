@@ -1,0 +1,11 @@
+[
+  {
+    "id":   "1",
+    "name": "pasu-home",
+    "spec": "@every 5s",
+    "action": {
+      "resource": "https://pasu.me",
+      "type": "http"
+    }
+  }
+]

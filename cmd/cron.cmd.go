@@ -17,5 +17,6 @@ var CronAdd cobraCommandFunc = func(cmd *cobra.Command, args []string) {
 	}
 
 	var parser, _ = files.GetParser(format)
-	fmt.Println(parser.FileSuffix)
+	entries := parser.ParseEntries("./cron-entries" + parser.FileSuffix)
+	fmt.Println(entries)
 }
