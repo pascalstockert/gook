@@ -16,7 +16,6 @@ func GetJsonParser() *types.FileParser {
 	return &parser
 }
 
-// TODO parse from file
 func parseEntries(path string) []types.CronEntry {
 	data, err := ReadFile(path, OpenOptions{create: true})
 	if err != nil {
