@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"go-webhook/shared/env"
 	"go-webhook/shared/files"
+	"go-webhook/shared/helper"
 	"os"
 )
 
@@ -41,8 +42,7 @@ var CronAdd cobraCommandFunc = func(cmd *cobra.Command, args []string) {
 		},
 	})
 
-	fmt.Println(responses[0])
-	fmt.Println(responses[1])
-	fmt.Println(responses[2])
-	fmt.Println(responses[3])
+	name, spec, protocol, location := helper.Destructure4(responses)
+
+	fmt.Println(name, spec, protocol, location)
 }
