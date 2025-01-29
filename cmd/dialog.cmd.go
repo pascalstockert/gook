@@ -16,13 +16,19 @@ func Dialog(reader bufio.Reader, phrases []Phrase) []string {
 	responses := make([]string, len(phrases))
 
 	for index, phrase := range phrases {
-		responses[index] = prompt(&reader, phrase)
+		response, e := prompt(&reader, phrase)
+
+		if e != nil {
+			panic(e)
+		}
+
+		responses[index] = response
 	}
 
 	return responses
 }
 
-func prompt(reader *bufio.Reader, phrase Phrase) string {
+func prompt(reader *bufio.Reader, phrase Phrase) (string, error) {
 	if phrase.Options != nil {
 		return promptSelect(phrase.Claim, phrase.Options)
 	}
@@ -30,20 +36,28 @@ func prompt(reader *bufio.Reader, phrase Phrase) string {
 	return promptLine(reader, phrase.Claim)
 }
 
-func promptLine(reader *bufio.Reader, claim string) string {
+func promptLine(reader *bufio.Reader, claim string) (string, error) {
 	fmt.Println(claim)
-	response, _ := reader.ReadString('\n')
+	response, e := reader.ReadString('\n')
 
-	return strings.TrimSpace(response)
+	if e != nil {
+		return "", e
+	}
+
+	return strings.TrimSpace(response), nil
 }
 
-func promptSelect(claim string, options []string) string {
+func promptSelect(claim string, options []string) (string, error) {
 	response := ""
 	prompt := &survey.Select{
 		Message: claim,
 		Options: options,
 	}
-	_ = survey.AskOne(prompt, &response)
+	e := survey.AskOne(prompt, &response)
 
-	return response
+	if e != nil {
+		return "", e
+	}
+
+	return response, nil
 }
