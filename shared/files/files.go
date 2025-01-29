@@ -1,12 +1,15 @@
 package files
 
-import "os"
+import (
+	"errors"
+	"os"
+)
 
-type OpenOptions struct {
+type ReadFileOptions struct {
 	create bool
 }
 
-func ReadFile(path string, opts struct{ create bool }) ([]byte, error) {
+func ReadFile(path string, opts ReadFileOptions) ([]byte, error) {
 	file, err := os.ReadFile(path)
 
 	if err != nil && opts.create {
@@ -20,4 +23,18 @@ func ReadFile(path string, opts struct{ create bool }) ([]byte, error) {
 	}
 
 	return file, err
+}
+
+type CreateFileOptions struct{ truncate bool }
+
+func CreateFile(path string, opts CreateFileOptions) (*os.File, error) {
+	var file *os.File
+
+	if _, err := os.Stat(path); os.IsNotExist(err) || opts.truncate {
+		file, err = os.Create(path)
+
+		return file, err
+	}
+
+	return nil, errors.New("cannot create file: " + path)
 }
