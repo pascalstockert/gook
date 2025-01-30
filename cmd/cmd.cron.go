@@ -8,7 +8,6 @@ import (
 	"github.com/spf13/cobra"
 	"go-webhook/shared/env"
 	"go-webhook/shared/files"
-	"go-webhook/shared/helper"
 	"go-webhook/shared/types"
 )
 
@@ -18,12 +17,9 @@ var CronAdd cobraCommandFunc = func(cmd *cobra.Command, args []string) {
 	format := getFileFormat()
 	parser, _ := files.GetParser(format)
 	filePath := getFilePath(parser)
-	// TODO make filePath absolute with os.Executable()
 	entries := parser.ParseEntries(filePath)
 	reader := bufio.NewReader(os.Stdin)
-	responses := Dialog(*reader, CronAddPhrases)
-
-	name, spec, protocol, location := helper.Destructure4(responses)
+	name, spec, protocol, location := getCronAddDialogResponses(*reader)
 
 	entries = append(entries, types.CronEntry{
 		Id:   uuid.New().String(),
@@ -48,6 +44,7 @@ func determineCronActionType(protocol string) types.CronActionType {
 }
 
 func getFilePath(parser *types.FileParser) string {
+	// TODO make filePath absolute with os.Executable()
 	return "./cron-entries" + parser.FileSuffix
 }
 
