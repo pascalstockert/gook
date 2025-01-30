@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 
 	"github.com/google/uuid"
@@ -16,45 +15,13 @@ import (
 type cobraCommandFunc func(cmd *cobra.Command, args []string)
 
 var CronAdd cobraCommandFunc = func(cmd *cobra.Command, args []string) {
-	format, e := env.Get("CRON_FILE_FORMAT")
-	if e != nil {
-		panic(e)
-	}
-
+	format := getFileFormat()
 	parser, _ := files.GetParser(format)
-
+	filePath := getFilePath(parser)
 	// TODO make filePath absolute with os.Executable()
-	filePath := "./cron-entries" + parser.FileSuffix
-	entries := parser.ParseEntries("./cron-entries" + parser.FileSuffix)
+	entries := parser.ParseEntries(filePath)
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Println(entries)
-
-	responses := Dialog(*reader, []Phrase{
-		{
-			Claim: "Name the cronjob:",
-		},
-		{
-			Claim: "Specify the cron-spec",
-		},
-		{
-			Claim: "Choose a protocol:",
-			Options: []string{
-				"http",
-			},
-		},
-		{
-			Claim: "Specify the resource location:",
-		},
-	})
-
-	determineCronActionType := func(protocol string) types.CronActionType {
-		switch protocol {
-		case "http":
-			return types.CronActionTypeHttp
-		}
-
-		panic("Unsupported protocol: " + protocol)
-	}
+	responses := Dialog(*reader, CronAddPhrases)
 
 	name, spec, protocol, location := helper.Destructure4(responses)
 
@@ -69,6 +36,26 @@ var CronAdd cobraCommandFunc = func(cmd *cobra.Command, args []string) {
 	})
 
 	parser.WriteEntries(filePath, entries)
+}
 
-	fmt.Println(entries)
+func determineCronActionType(protocol string) types.CronActionType {
+	switch protocol {
+	case "http":
+		return types.CronActionTypeHttp
+	}
+
+	panic("Unsupported protocol: " + protocol)
+}
+
+func getFilePath(parser *types.FileParser) string {
+	return "./cron-entries" + parser.FileSuffix
+}
+
+func getFileFormat() string {
+	format, e := env.Get("CRON_FILE_FORMAT")
+	if e != nil {
+		panic(e)
+	}
+
+	return format
 }
