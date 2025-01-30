@@ -2,11 +2,12 @@ package cmd
 
 import (
 	"bufio"
+	"os"
 
 	"go-webhook/shared/helper"
 )
 
-func getCronAddDialogResponses(reader bufio.Reader) (
+func getCronAddDialogResponses() (
 	name string,
 	spec string,
 	protocol string,
@@ -29,7 +30,13 @@ func getCronAddDialogResponses(reader bufio.Reader) (
 			Claim: "Specify the resource location:",
 		},
 	}
-	responses := Dialog(reader, phrases)
+
+	reader := getNewReader()
+	responses := Dialog(*reader, phrases)
 
 	return helper.Destructure4(responses)
+}
+
+func getNewReader() *bufio.Reader {
+	return bufio.NewReader(os.Stdin)
 }

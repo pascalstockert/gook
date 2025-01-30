@@ -1,9 +1,6 @@
 package cmd
 
 import (
-	"bufio"
-	"os"
-
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 	"go-webhook/shared/env"
@@ -18,8 +15,7 @@ var CronAdd cobraCommandFunc = func(cmd *cobra.Command, args []string) {
 	parser, _ := files.GetParser(format)
 	filePath := getFilePath(parser)
 	entries := parser.ParseEntries(filePath)
-	reader := bufio.NewReader(os.Stdin)
-	name, spec, protocol, location := getCronAddDialogResponses(*reader)
+	name, spec, protocol, location := getCronAddDialogResponses()
 
 	entries = append(entries, types.CronEntry{
 		Id:   uuid.New().String(),
