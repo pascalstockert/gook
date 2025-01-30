@@ -1,9 +1,10 @@
 package main
 
 import (
+	"log"
+
 	"github.com/robfig/cron"
 	"go-webhook/shared/types"
-	"log"
 )
 
 func main() {

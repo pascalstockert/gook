@@ -3,8 +3,9 @@ package cmd
 import (
 	"bufio"
 	"fmt"
-	"github.com/AlecAivazis/survey/v2"
 	"strings"
+
+	"github.com/AlecAivazis/survey/v2"
 )
 
 type Phrase struct {

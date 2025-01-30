@@ -3,13 +3,14 @@ package cmd
 import (
 	"bufio"
 	"fmt"
+	"os"
+
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 	"go-webhook/shared/env"
 	"go-webhook/shared/files"
 	"go-webhook/shared/helper"
 	"go-webhook/shared/types"
-	"os"
 )
 
 type cobraCommandFunc func(cmd *cobra.Command, args []string)

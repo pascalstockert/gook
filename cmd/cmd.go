@@ -2,11 +2,12 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"os"
 	"os/exec"
 	"strconv"
 	"syscall"
+
+	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
