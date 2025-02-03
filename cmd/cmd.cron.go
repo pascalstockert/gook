@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"os"
+	"strings"
+
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 	"go-webhook/shared/env"
@@ -40,8 +43,12 @@ func determineCronActionType(protocol string) types.CronActionType {
 }
 
 func getFilePath(parser *types.FileParser) string {
-	// TODO make filePath absolute with os.Executable()
-	return "./cron-entries" + parser.FileSuffix
+	executableLocation, _ := os.Executable()
+	pathArray := strings.Split(executableLocation, "/")
+	workingDirectory := strings.Join(pathArray[:len(pathArray)-1], "/") + "/"
+	fileName := "cron-entries"
+
+	return workingDirectory + fileName + parser.FileSuffix
 }
 
 func getFileFormat() string {

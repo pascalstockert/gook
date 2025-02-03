@@ -2,6 +2,7 @@ package files
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"go-webhook/shared/types"
 )
@@ -22,6 +23,12 @@ func parseEntries(path string) []types.CronEntry {
 	data, err := ReadFile(path, ReadFileOptions{create: true})
 	if err != nil {
 		panic(err)
+	}
+
+	if len(data) == 0 {
+		fmt.Println("No file or entries found in path: " + path)
+		fmt.Println("Creating a new file")
+		return []types.CronEntry{}
 	}
 
 	var temp []types.CronEntry
