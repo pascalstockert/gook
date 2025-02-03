@@ -1,5 +1,5 @@
 build-main:
-	go build -o bin/main main.go
+	go build -o bin/gook main.go
 
 build-http-server:
 	go build -o bin/http-server ./worker-http/main.go
