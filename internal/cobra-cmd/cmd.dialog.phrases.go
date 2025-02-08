@@ -1,10 +1,10 @@
-package cmd
+package cobra_cmd
 
 import (
 	"bufio"
 	"os"
 
-	"go-webhook/shared/helper"
+	"go-webhook/pkg/helper"
 )
 
 func getCronAddDialogResponses() (

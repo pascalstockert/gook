@@ -3,7 +3,7 @@ package files
 import (
 	"errors"
 
-	"go-webhook/shared/types"
+	"go-webhook/pkg/types"
 )
 
 func GetParser(format string) (*types.FileParser, error) {

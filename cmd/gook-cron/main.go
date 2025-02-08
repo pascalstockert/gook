@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/robfig/cron"
-	"go-webhook/shared/types"
+	"go-webhook/pkg/types"
 )
 
 func main() {

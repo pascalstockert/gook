@@ -1,5 +1,5 @@
 FROM alpine
 
-COPY ./bin/ /usr/bin/gook/
+COPY ./bin/ /usr/gook/
 
-ENV PATH="${PATH}:/usr/bin/gook"
+ENV PATH="${PATH}:/usr/gook"

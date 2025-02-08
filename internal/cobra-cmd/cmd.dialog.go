@@ -1,4 +1,4 @@
-package cmd
+package cobra_cmd
 
 import (
 	"bufio"

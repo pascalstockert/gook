@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"go-webhook/shared/types"
+	"go-webhook/pkg/types"
 )
 
 var suffix = ".json"

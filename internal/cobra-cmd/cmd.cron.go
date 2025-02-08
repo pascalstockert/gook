@@ -1,4 +1,4 @@
-package cmd
+package cobra_cmd
 
 import (
 	"os"
@@ -6,9 +6,9 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
-	"go-webhook/shared/env"
-	"go-webhook/shared/files"
-	"go-webhook/shared/types"
+	"go-webhook/pkg/env"
+	"go-webhook/pkg/files"
+	"go-webhook/pkg/types"
 )
 
 type cobraCommandFunc func(cmd *cobra.Command, args []string)
