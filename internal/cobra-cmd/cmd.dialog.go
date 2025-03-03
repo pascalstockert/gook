@@ -9,24 +9,41 @@ import (
 )
 
 type Phrase struct {
-	Claim   string
-	Options []string
+	Claim    string
+	Options  []string
+	Validate []func(string) error
 }
 
-func Dialog(reader bufio.Reader, phrases []Phrase) []string {
+func Dialog(reader bufio.Reader, phrases []Phrase) ([]string, error) {
 	responses := make([]string, len(phrases))
 
 	for index, phrase := range phrases {
-		response, e := prompt(&reader, phrase)
+		var response string
+		var err error
 
-		if e != nil {
-			panic(e)
+		for {
+			response, err = prompt(&reader, phrase)
+
+			if err != nil {
+				return nil, err
+			}
+
+			if phrase.Validate != nil {
+				err = validatePhraseResponse(phrase, response)
+
+				if err != nil {
+					fmt.Println(err)
+
+					continue
+				}
+			}
+
+			responses[index] = response
+			break
 		}
-
-		responses[index] = response
 	}
 
-	return responses
+	return responses, nil
 }
 
 func prompt(reader *bufio.Reader, phrase Phrase) (string, error) {
@@ -61,4 +78,18 @@ func promptSelect(claim string, options []string) (string, error) {
 	}
 
 	return response, nil
+}
+
+func validatePhraseResponse(phrase Phrase, response string) error {
+	var errs []error
+
+	for _, validateFn := range phrase.Validate {
+		errs = append(errs, validateFn(response))
+	}
+
+	if len(errs) > 0 {
+		return errs[0]
+	}
+
+	return nil
 }
