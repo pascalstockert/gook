@@ -14,6 +14,7 @@ func main() {
 	c := cron.New()
 	c.Start()
 
+	// TODO refactor into generic function & call once for initiation
 	format, e := env.Get("CRON_FILE_FORMAT")
 	if e != nil {
 		fmt.Println("could not get env", e)
@@ -28,8 +29,12 @@ func main() {
 
 	entries := parser.ParseEntries(filePath)
 
+	// TODO store relation between cronjob and csv-entry to keep track of stopped/started jobs
 	for _, entry := range entries {
-		fmt.Println(entry)
+		_ = c.AddFunc(entry.Spec, func() {
+			// TODO determine action to execute
+			fmt.Println(entry.Action)
+		})
 	}
 
 	// keep alive
