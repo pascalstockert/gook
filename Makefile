@@ -1,6 +1,9 @@
 gook:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/gook cmd/gook/main.go
 
+gook-cron:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/gook-cron cmd/gook-cron/main.go
+
 gook-http:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/http-server cmd/gook-http/main.go
 
