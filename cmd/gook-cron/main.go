@@ -2,13 +2,10 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"strings"
 
 	"github.com/robfig/cron"
 	"go-webhook/pkg/env"
 	"go-webhook/pkg/files"
-	"go-webhook/pkg/types"
 )
 
 func main() {
@@ -27,7 +24,7 @@ func main() {
 		fmt.Println("could not get parser", e)
 	}
 
-	filePath := getFilePath(parser)
+	filePath := parser.GetFilePath("cron-entries")
 
 	entries := parser.ParseEntries(filePath)
 
@@ -37,13 +34,4 @@ func main() {
 
 	// keep alive
 	<-make(chan struct{})
-}
-
-func getFilePath(parser *types.FileParser) string {
-	executableLocation, _ := os.Executable()
-	pathArray := strings.Split(executableLocation, "/")
-	workingDirectory := strings.Join(pathArray[:len(pathArray)-1], "/") + "/"
-	fileName := "cron-entries"
-
-	return workingDirectory + fileName + parser.FileSuffix
 }

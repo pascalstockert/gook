@@ -3,6 +3,8 @@ package files
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"strings"
 
 	"go-webhook/pkg/types"
 )
@@ -13,6 +15,7 @@ func GetJsonParser() *types.FileParser {
 	var parser = types.FileParser{
 		ParseEntries: parseEntries,
 		WriteEntries: writeEntries,
+		GetFilePath:  getFilePath,
 		FileSuffix:   suffix,
 	}
 
@@ -60,4 +63,14 @@ func writeEntries(path string, entries []types.CronEntry) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func getFilePath(fileName string) string {
+	executableLocation, _ := os.Executable()
+	pathArray := strings.Split(executableLocation, "/")
+	workingDirectory := strings.Join(pathArray[:len(pathArray)-1], "/") + "/"
+
+	fmt.Println(workingDirectory + fileName + suffix)
+
+	return workingDirectory + fileName + suffix
 }

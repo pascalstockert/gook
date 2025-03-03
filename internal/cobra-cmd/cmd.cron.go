@@ -1,9 +1,6 @@
 package cobra_cmd
 
 import (
-	"os"
-	"strings"
-
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 	"go-webhook/pkg/env"
@@ -16,7 +13,7 @@ type cobraCommandFunc func(cmd *cobra.Command, args []string)
 var CronAdd cobraCommandFunc = func(cmd *cobra.Command, args []string) {
 	format := getFileFormat()
 	parser, _ := files.GetParser(format)
-	filePath := getFilePath(parser)
+	filePath := parser.GetFilePath("cron-entries")
 	entries := parser.ParseEntries(filePath)
 	name, spec, protocol, location := getCronAddDialogResponses()
 
@@ -40,15 +37,6 @@ func determineCronActionType(protocol string) types.CronActionType {
 	}
 
 	panic("Unsupported protocol: " + protocol)
-}
-
-func getFilePath(parser *types.FileParser) string {
-	executableLocation, _ := os.Executable()
-	pathArray := strings.Split(executableLocation, "/")
-	workingDirectory := strings.Join(pathArray[:len(pathArray)-1], "/") + "/"
-	fileName := "cron-entries"
-
-	return workingDirectory + fileName + parser.FileSuffix
 }
 
 func getFileFormat() string {
