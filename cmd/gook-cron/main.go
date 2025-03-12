@@ -10,50 +10,73 @@ import (
 	"go-webhook/pkg/types"
 )
 
-func main() {
-	env.Init()
+var cronWorker *cron.Cron
 
-	c := cron.New()
-	c.Start()
-
-	// TODO refactor into generic function & call once for initiation
+func parseEntries() []types.CronEntry {
 	format, e := env.Get("CRON_FILE_FORMAT")
 	if e != nil {
-		fmt.Println("could not get env", e)
+		fmt.Println("could not get env-key CRON_FILE_FORMAT", e)
 	}
 
 	parser, e := files.GetParser(format)
 	if e != nil {
-		fmt.Println("could not get parser", e)
+		fmt.Println("could not get parser for format "+format, e)
 	}
 
-	filePath := parser.GetFilePath("cron-entries")
+	filePath, e := parser.GetFilePath("cron-entries")
+	if e != nil {
+		fmt.Println("could not get file path for cron-entries", e)
+	}
 
-	entries := parser.ParseEntries(filePath)
+	return parser.ParseEntries(filePath)
+}
 
+var actionFunctionHttp = func(entry types.CronEntry) {
+	req, err := http.NewRequest("GET", "http://"+entry.Action.Resource, nil)
+	if err != nil {
+		fmt.Println("could not create request", err)
+		return
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		fmt.Println("could not send request", err)
+		return
+	}
+
+	fmt.Println(res.StatusCode)
+}
+
+func getActionFunctionForEntry(entry types.CronEntry) func() {
+	functionMap := map[types.CronActionType]func(){
+		types.CronActionTypeHttp: func() { actionFunctionHttp(entry) },
+	}
+
+	return functionMap[entry.Action.Type]
+}
+
+func addEntriesToCronWorker(entries []types.CronEntry) {
 	// TODO store relation between cronjob and csv-entry to keep track of stopped/started jobs
+
 	for _, entry := range entries {
-		_ = c.AddFunc(entry.Spec, func() {
-			if entry.Action.Type == types.CronActionTypeHttp {
-				req, err := http.NewRequest("GET", "https://"+entry.Action.Resource, nil)
-				if err != nil {
-					fmt.Println("could not create request", err)
-					return
-				}
+		actionFunction := getActionFunctionForEntry(entry)
 
-				res, err := http.DefaultClient.Do(req)
-				if err != nil {
-					fmt.Println("could not send request", err)
-					return
-				}
+		err := cronWorker.AddFunc(entry.Spec, actionFunction)
 
-				fmt.Println(res.StatusCode)
-			}
-
-			// TODO determine action to execute
-			fmt.Println(entry.Action)
-		})
+		if err != nil {
+			fmt.Println("could not add entry to cron worker", err)
+		}
 	}
+}
+
+func main() {
+	env.Init()
+
+	cronWorker = cron.New()
+	cronWorker.Start()
+
+	entries := parseEntries()
+	addEntriesToCronWorker(entries)
 
 	// keep alive
 	<-make(chan struct{})

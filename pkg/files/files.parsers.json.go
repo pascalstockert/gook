@@ -65,12 +65,16 @@ func writeEntries(path string, entries []types.CronEntry) {
 	}
 }
 
-func getFilePath(fileName string) string {
-	executableLocation, _ := os.Executable()
+func getFilePath(fileName string) (string, error) {
+	executableLocation, err := os.Executable()
+	if err != nil {
+		return "", err
+	}
+
 	pathArray := strings.Split(executableLocation, "/")
 	workingDirectory := strings.Join(pathArray[:len(pathArray)-1], "/") + "/"
 
 	fmt.Println(workingDirectory + fileName + suffix)
 
-	return workingDirectory + fileName + suffix
+	return workingDirectory + fileName + suffix, nil
 }
